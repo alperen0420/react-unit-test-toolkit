@@ -1,0 +1,29 @@
+{
+  "sourceFile": "src/components/LoginForm.tsx",
+  "scenarios": [
+    {
+      "id": "TC-001",
+      "when": "The submit button is clicked with empty email and password",
+      "expect": "The form displays an input error and does not call submit",
+      "evidence": "handleSubmit checks !email || !password"
+    },
+    {
+      "id": "TC-002",
+      "when": "Both fields are filled and submitted",
+      "expect": "submit receives the entered email and password",
+      "evidence": "await submit(email, password)"
+    },
+    {
+      "id": "TC-003",
+      "when": "submit rejects",
+      "expect": "An error alert becomes visible",
+      "evidence": "catch block updates the visible error"
+    },
+    {
+      "id": "TC-004",
+      "when": "submit is pending",
+      "expect": "The submit button is disabled and shows a loading label",
+      "evidence": "busy state controls button disabled and label"
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+name: CI
+on:
+  push:
+  pull_request:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install MCP dependencies
+        run: npm install --no-audit --no-fund
+      - name: Install demo dependencies
+        run: npm install --prefix examples/demo-react --no-audit --no-fund
+      - name: Typecheck MCP toolkit
+        run: npm run typecheck
+      - name: Unit tests
+        run: npm test
+      - name: Typecheck React demo
+        run: npm run typecheck --prefix examples/demo-react
+      - name: Demo component and hook tests
+        run: npm run test:demo
+      - name: Real MCP handshake and Vitest tool smoke test
+        run: npm run test:mcp
+      - name: Demo coverage JSON generation
+        run: npm run coverage:demo

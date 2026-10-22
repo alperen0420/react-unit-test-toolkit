@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "react-unit-testing": {
+      "command": "node",
+      "args": ["/ABSOLUTE/PATH/TO/react-unit-test-toolkit/dist/server.js"],
+      "env": {
+        "REACT_TEST_ALLOWED_ROOT": "/ABSOLUTE/PATH/TO/YOUR/react-project"
+      },
+      "disabled": false,
+      "autoApprove": []
+    }
+  }
+}
