@@ -1,28 +1,36 @@
-# Test quality strategy
+# Focused test generation strategy
 
-**Goal:** validate meaningful, user-observable React behavior instead of optimizing only for passing tests or line coverage.
+## Target selection
 
-## Agent workflow
+Choose a single source explicitly, or call `get_changed_components` to discover new/changed React components and hooks. The changed-file list is not permission to generate tests for the entire repository. Changed utilities can suggest affected component candidates via reverse imports.
 
-1. Read the target component, relevant dependencies, and nearby tests.
-2. Plan scenarios that have evidence in the implementation; do not invent requirements.
-3. Write Vitest and React Testing Library tests for observable behavior.
-4. Run static validation and the relevant test file; classify failures before modifying tests.
-5. Fix incorrect test implementations, but do not weaken expectations to hide application defects.
-6. Report coverage only when a real coverage report exists for the target file.
+## Context and impact
+
+- Call `analyze_react_file` for structural hints.
+- Use `get_related_context` to inspect only the selected source and its relevant local import graph (one or two hops).
+- Use `get_affected_components` for reverse-import impact suggestions when a shared module changes.
+- Imported dependencies explain observable behavior; they do not automatically become separate test targets.
+- Module imports are a static approximation. Providers, runtime dependency injection, dynamic imports and framework conventions may need review.
+
+## Scenario planning
+
+For the approved target, write evidence-based scenarios with stable IDs. Each scenario should include a user action or input, the observable result, and a source location or behavior confirming the scenario is supported. Consider success, error, empty, disabled, boundary, loading and async behavior **only when the source supports them**.
+
+## Validation
+
+1. Follow existing project conventions and use Vitest/React Testing Library for component behavior.
+2. Check import structure and syntax with `validate_test`.
+3. After explicit approval, execute the selected test using `run_unit_test`.
+4. Diagnose failure first: test implementation problem, project configuration problem or potential application defect. Repair test-code mistakes at most twice, and never weaken assertions to hide genuine defects.
+5. Where meaningful, and with approval, run statically related regression tests using `run_related_tests`.
+6. Include real coverage measurements only when `coverage/coverage-final.json` is available. Report limitations and untested scenarios.
 
 ## Quality indicators
 
-- Observable behavior coverage: which source-supported scenarios are tested.
-- Execution outcome: passed, failed, and skipped tests from actual Vitest runs.
-- Correct imports: the test imports the intended implementation.
-- Mutation sensitivity (optional): would changing a key condition make a relevant test fail?
-- Fragility: dependence on internal state, CSS selectors, timing, or large snapshots.
-- Repair efficiency: iterations required to deliver valid tests.
+- Evidence-backed test scenarios and observable assertions.
+- Successful verified runtime execution and test pass/fail/skipped counts.
+- Sensitivity to meaningful regressions, with optional mutation testing.
+- Limited reliance on implementation details, snapshots and arbitrary timers.
+- Small context footprint relative to the selected component and its dependencies.
 
-## Limitations
-
-- `validate_test` is a heuristic syntax and structure check, not a full type checker or test review.
-- High coverage does not prove test quality.
-- Some projects need additional environment setup (routing providers, MSW, custom transforms, or workspace configuration).
-- The MCP server provides deterministic tools. Scenario planning and test generation are carried out by the host coding assistant.
+Passing test counts and line coverage alone are not measures of test quality. The MCP server returns deterministic observations; the coding assistant is responsible for interpreting them.

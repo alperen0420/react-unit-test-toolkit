@@ -2,7 +2,7 @@ import { spawn } from 'node:child_process';
 import { mkdtemp, readFile, rm } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
-import { getProjectRoot, resolveProjectFile, TEST_EXTS } from './security.js';
+import { getProjectRoot, resolveProjectFile, TEST_EXTS, SOURCE_EXTS } from './security.js';
 
 type VitestJson = {
   numTotalTests?: number;
@@ -24,8 +24,16 @@ function appendCapped(oldText: string, chunk: string): string {
 }
 
 export async function runUnitTest(testFile: string, timeoutMs = 60_000): Promise<object> {
+  return executeVitest(testFile, 'run', timeoutMs);
+}
+
+export async function runRelatedTests(sourceFile: string, timeoutMs = 60_000): Promise<object> {
+  return executeVitest(sourceFile, 'related', timeoutMs);
+}
+
+async function executeVitest(filePath: string, mode: 'run' | 'related', timeoutMs: number): Promise<object> {
   const root = await getProjectRoot();
-  const test = await resolveProjectFile(root, testFile, TEST_EXTS);
+  const test = await resolveProjectFile(root, filePath, mode === 'run' ? TEST_EXTS : SOURCE_EXTS);
   const entry = await resolveProjectFile(root, 'node_modules/vitest/vitest.mjs', ['.mjs']).catch(() => {
     throw new Error('Project-local Vitest not found. Install the React project dependencies first.');
   });
@@ -39,7 +47,8 @@ export async function runUnitTest(testFile: string, timeoutMs = 60_000): Promise
     const exitCode = await new Promise<number>((resolve, reject) => {
       const child = spawn(process.execPath, [
         entry.absolute,
-        'run', test.relative,
+        mode, test.relative,
+        ...(mode === 'related' ? ['--run'] : []),
         '--reporter=json',
         `--outputFile=${outputFile}`,
       ], {
@@ -63,7 +72,8 @@ export async function runUnitTest(testFile: string, timeoutMs = 60_000): Promise
       .map(item => ({ name: item.fullName ?? '(unnamed)', messages: (item.failureMessages ?? []).map(s => s.slice(0, 1600)).slice(0, 3) }))
       .slice(0, 20) ?? [];
     return {
-      testFile: test.relative,
+      [mode === 'related' ? 'sourceFile' : 'testFile']: test.relative,
+      mode,
       status: timedOut ? 'timeout' : exitCode === 0 ? 'passed' : 'failed',
       exitCode,
       timedOut,

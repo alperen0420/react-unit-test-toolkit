@@ -25,5 +25,12 @@
       "expect": "The submit button is disabled and shows a loading label",
       "evidence": "busy state controls button disabled and label"
     }
-  ]
+  ],
+  "selection": {
+    "mode": "selected",
+    "sourceFile": "src/components/LoginForm.tsx",
+    "contextDepth": 2,
+    "relatedModulesUsed": [],
+    "note": "Dynamic plan example: populate relatedModulesUsed from actual project imports; do not invent dependencies."
+  }
 }

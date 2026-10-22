@@ -6,7 +6,7 @@ import assert from 'node:assert/strict';
 
 const repo = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const demo = path.join(repo, 'examples', 'demo-react');
-const client = new Client({ name: 'react-test-mcp-smoke', version: '0.1.0' });
+const client = new Client({ name: 'react-test-mcp-smoke', version: '0.2.0' });
 const transport = new StdioClientTransport({
   command: process.execPath,
   args: [path.join(repo, 'dist', 'server.js')],
@@ -26,19 +26,27 @@ try {
   const tools = (await client.listTools()).tools;
   const names = tools.map(x => x.name);
   assert.deepEqual(names.sort(), [
-    'inspect_project', 'analyze_react_file', 'validate_test', 'run_unit_test', 'get_test_coverage'
+    'inspect_project', 'analyze_react_file', 'get_related_context', 'get_changed_components', 'get_affected_components', 'validate_test', 'run_unit_test', 'run_related_tests', 'get_test_coverage'
   ].sort());
   const project = await call('inspect_project', {});
   assert.equal(project.vitestEntrypointFound, true);
   const analyzed = await call('analyze_react_file', { file: 'src/components/Counter.tsx' });
   assert.ok(analyzed.jsxEventHandlers.includes('onClick'));
+  const related = await call('get_related_context', { file: 'src/components/Counter.tsx' });
+  assert.equal(related.target, 'src/components/Counter.tsx');
+  const changed = await call('get_changed_components', {});
+  assert.ok(Array.isArray(changed.selectedTargets));
+  const impacted = await call('get_affected_components', { file: 'src/components/Counter.tsx' });
+  assert.ok(Array.isArray(impacted.affected));
   const validated = await call('validate_test', {
     testFile: 'src/components/Counter.test.tsx', sourceFile: 'src/components/Counter.tsx',
   });
   assert.equal(validated.valid, true, JSON.stringify(validated));
   const tested = await call('run_unit_test', { testFile: 'src/components/Counter.test.tsx' });
   assert.equal(tested.status, 'passed', JSON.stringify(tested));
-  console.log('MCP handshake, 5 tools, AST analysis, validation and real Vitest execution: OK');
+  const relatedTests = await call('run_related_tests', { sourceFile: 'src/components/Counter.tsx' });
+  assert.equal(relatedTests.status, 'passed', JSON.stringify(relatedTests));
+  console.log('MCP handshake, 9 tools, graph/changes, validation, Vitest and related smoke: OK');
 } finally {
   await client.close();
 }

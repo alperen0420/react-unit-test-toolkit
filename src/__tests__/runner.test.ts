@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { mkdtemp, mkdir, writeFile, rm } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
-import { runUnitTest } from '../runner.js';
+import { runUnitTest, runRelatedTests } from '../runner.js';
 
 test('runner invokes only the project-local Vitest entry and reads structured results', async () => {
   const root = await mkdtemp(path.join(os.tmpdir(), 'mcp-runner-'));
@@ -31,6 +31,12 @@ test('runner invokes only the project-local Vitest entry and reads structured re
     assert.equal(res.totals.failed, 1);
     assert.equal(res.failures[0]?.name, 'broken');
     await assert.rejects(runUnitTest('../outside.test.tsx'), /traversal/);
+    await writeFile(path.join(root, 'src', 'Button.tsx'), 'export const Button = () => null');
+    const related = await runRelatedTests('src/Button.tsx') as { mode: string; sourceFile: string; status: string };
+    assert.equal(related.mode, 'related');
+    assert.equal(related.sourceFile, 'src/Button.tsx');
+    assert.equal(related.status, 'failed');
+    await assert.rejects(runRelatedTests('../outside.tsx'), /traversal/);
   } finally {
     if (previous === undefined) delete process.env.REACT_TEST_ALLOWED_ROOT;
     else process.env.REACT_TEST_ALLOWED_ROOT = previous;
