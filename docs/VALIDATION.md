@@ -1,16 +1,13 @@
-# Validation status for v0.2.0
+# Validation and compatibility
 
-## Verified locally
+This repository provides a self-contained Cline-compatible `SKILL.md` with optional short-lived local Node helper commands. It does not require a model API key or a long-running service.
 
-- TypeScript type check of all non-MCP core modules using TypeScript 5.x (the MCP SDK dependency was not installed in the isolated authoring environment).
-- 12 Node test cases passing, including dependency graph resolution, tsconfig paths aliases, Git working-tree changes, path confinement, test runner report handling, coverage and validator checks.
-- `src/server.ts` passed a TypeScript syntax transpilation check.
-- Repository text scan found no company- or deployment-specific language.
+The GitHub Actions workflow validates:
+- TypeScript type checking and deterministic helper unit tests.
+- Portable Skill packaging and invocation from its own `scripts` folder.
+- React demo tests and Istanbul coverage generation.
+- Test execution using the project's existing local Vitest runner.
 
-## Requires GitHub Actions or an environment with npm access
+Jest support is covered by an isolated fake Jest binary test for invocation and result parsing; real-world Jest project configuration (transformers, monorepos, environment setup) varies and should be smoke-tested in the target project. The validator includes CommonJS `require()` support, but static validation cannot prove runtime correctness.
 
-- Full typecheck with `@modelcontextprotocol/server`, Zod, and the installed npm type definitions.
-- Full example React/Vitest run and coverage generation.
-- Real MCP `stdio` handshake and both selected and related Vitest tool execution.
-
-The prior CI build failed during demo `npm install` with npm Arborist's `edgesOut` error. Version 0.2 adds a `--legacy-peer-deps` workaround for the demo dependency installation. CI must be rerun after publication; this is a mitigation and should not be claimed as proven until the workflow passes.
+Do not claim a new release's CI has passed until GitHub Actions reports success for the new commit.

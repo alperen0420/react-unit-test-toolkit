@@ -1,36 +1,29 @@
 {
+  "mode": "detailed",
   "sourceFile": "src/components/LoginForm.tsx",
+  "relatedModulesReviewed": ["src/hooks/useAuth.ts"],
   "scenarios": [
     {
-      "id": "TC-001",
-      "when": "The submit button is clicked with empty email and password",
-      "expect": "The form displays an input error and does not call submit",
-      "evidence": "handleSubmit checks !email || !password"
+      "id": "LOGIN-01",
+      "priority": "high",
+      "when": "The form is submitted with missing required fields",
+      "expect": "Validation feedback appears without calling the login boundary",
+      "evidence": "handleSubmit returns before login when a required value is missing"
     },
     {
-      "id": "TC-002",
-      "when": "Both fields are filled and submitted",
-      "expect": "submit receives the entered email and password",
-      "evidence": "await submit(email, password)"
+      "id": "LOGIN-02",
+      "priority": "high",
+      "when": "Valid credentials are submitted",
+      "expect": "The login boundary is called with the entered values",
+      "evidence": "The form calls login(email, password) after validation"
     },
     {
-      "id": "TC-003",
-      "when": "submit rejects",
-      "expect": "An error alert becomes visible",
-      "evidence": "catch block updates the visible error"
-    },
-    {
-      "id": "TC-004",
-      "when": "submit is pending",
-      "expect": "The submit button is disabled and shows a loading label",
-      "evidence": "busy state controls button disabled and label"
+      "id": "LOGIN-03",
+      "priority": "medium",
+      "when": "The login request is rejected",
+      "expect": "An error message is shown to the user",
+      "evidence": "The catch handler stores a visible error message"
     }
   ],
-  "selection": {
-    "mode": "selected",
-    "sourceFile": "src/components/LoginForm.tsx",
-    "contextDepth": 2,
-    "relatedModulesUsed": [],
-    "note": "Dynamic plan example: populate relatedModulesUsed from actual project imports; do not invent dependencies."
-  }
+  "note": "Illustrative only; include each scenario only if verified against real source code. No fixed number of tests is required."
 }

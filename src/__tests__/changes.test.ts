@@ -7,7 +7,7 @@ import path from 'node:path';
 import { getChangedComponents } from '../changes.js';
 
 test('Git status distinguishes added components, edited hooks and affected importers', async () => {
-  const root = await mkdtemp(path.join(os.tmpdir(), 'mcp-changes-'));
+  const root = await mkdtemp(path.join(os.tmpdir(), 'skill-changes-'));
   const prev = process.env.REACT_TEST_ALLOWED_ROOT;
   try {
     await mkdir(path.join(root, 'src'), { recursive: true });

@@ -6,7 +6,7 @@ import path from 'node:path';
 import { getProjectRoot, isInside, readProjectText } from '../security.js';
 
 test('path confinement rejects traversal, absolute paths, symlink escape', async () => {
-  const tmp = await mkdtemp(path.join(os.tmpdir(), 'mcp-security-'));
+  const tmp = await mkdtemp(path.join(os.tmpdir(), 'skill-security-'));
   const root = path.join(tmp, 'repo');
   const outside = path.join(tmp, 'outside.tsx');
   await mkdir(root);

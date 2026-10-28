@@ -6,7 +6,7 @@ import path from 'node:path';
 import { analyzeReactFile } from '../analyzer.js';
 
 test('AST analyzer finds props, hooks, events and conditionals', async () => {
-  const root = await mkdtemp(path.join(os.tmpdir(), 'mcp-analyze-'));
+  const root = await mkdtemp(path.join(os.tmpdir(), 'skill-analyze-'));
   await mkdir(path.join(root, 'src'));
   await writeFile(path.join(root, 'package.json'), '{}');
   await writeFile(path.join(root, 'src', 'Button.tsx'), `
@@ -28,6 +28,23 @@ test('AST analyzer finds props, hooks, events and conditionals', async () => {
     assert.ok(res.hookCalls.includes('useState'));
     assert.ok(res.jsxEventHandlers.includes('onClick'));
     assert.ok(res.conditionalNodes > 0);
+  } finally {
+    if (previous === undefined) delete process.env.REACT_TEST_ALLOWED_ROOT;
+    else process.env.REACT_TEST_ALLOWED_ROOT = previous;
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
+test('AST analyzer recognizes CommonJS require dependencies', async () => {
+  const root = await mkdtemp(path.join(os.tmpdir(), 'skill-analyze-cjs-'));
+  await mkdir(path.join(root, 'web'));
+  await writeFile(path.join(root, 'package.json'), '{}');
+  await writeFile(path.join(root, 'web', 'profile.js'), `const { normalize } = require('./normalize.js'); module.exports = { read: normalize };`);
+  const previous = process.env.REACT_TEST_ALLOWED_ROOT;
+  process.env.REACT_TEST_ALLOWED_ROOT = root;
+  try {
+    const res = await analyzeReactFile('web/profile.js') as { imports: Array<{from: string; symbols: string[]}> };
+    assert.ok(res.imports.some(i => i.from === './normalize.js' && i.symbols.includes('require')));
   } finally {
     if (previous === undefined) delete process.env.REACT_TEST_ALLOWED_ROOT;
     else process.env.REACT_TEST_ALLOWED_ROOT = previous;
