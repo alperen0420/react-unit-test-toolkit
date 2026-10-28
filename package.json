@@ -1,29 +1,20 @@
 {
   "name": "react-unit-test-toolkit",
-  "version": "0.2.0",
+  "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "Focused React/TypeScript unit testing MCP tools and coding-agent skill",
+  "description": "Portable React unit testing Agent Skill with optional deterministic local analysis and test helpers",
   "license": "MIT",
-  "engines": {
-    "node": ">=22"
-  },
+  "engines": { "node": ">=22" },
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "test": "npm run build && node --test dist/__tests__/*.test.js",
-    "test:mcp": "npm run build && node scripts/mcp-smoke.mjs",
+    "bundle:skill": "npm run build && node scripts/package-skill.mjs",
+    "test:skill": "node scripts/skill-smoke.mjs",
     "test:demo": "npm run test --prefix examples/demo-react",
-    "coverage:demo": "npm run test:coverage --prefix examples/demo-react",
-    "start": "node dist/server.js"
+    "coverage:demo": "npm run test:coverage --prefix examples/demo-react"
   },
-  "dependencies": {
-    "@modelcontextprotocol/server": "^2.3.1",
-    "typescript": "^5.9.3",
-    "zod": "^4.1.0"
-  },
-  "devDependencies": {
-    "@modelcontextprotocol/client": "^2.3.1",
-    "@types/node": "^22.0.0"
-  }
+  "dependencies": { "typescript": "^5.9.3" },
+  "devDependencies": { "@types/node": "^22.0.0" }
 }

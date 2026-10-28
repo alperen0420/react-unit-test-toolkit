@@ -16,7 +16,7 @@ test('Istanbul coverage summarizes branches and uncovered lines', () => {
 });
 
 test('coverage handles missing report without claiming 0% coverage', async () => {
-  const root = await mkdtemp(path.join(os.tmpdir(), 'mcp-coverage-'));
+  const root = await mkdtemp(path.join(os.tmpdir(), 'skill-coverage-'));
   await mkdir(path.join(root, 'src'));
   await writeFile(path.join(root, 'package.json'), '{}');
   await writeFile(path.join(root, 'src', 'Button.tsx'), 'export const Button = () => null');

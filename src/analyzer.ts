@@ -27,6 +27,9 @@ export async function analyzeReactFile(filePath: string): Promise<object> {
       if (named && ts.isNamespaceImport(named)) symbols.push('* as ' + named.name.text);
       imports.push({ from: node.moduleSpecifier.text, symbols });
     }
+    if (ts.isCallExpression(node) && ts.isIdentifier(node.expression) && node.expression.text === 'require' && node.arguments[0] && ts.isStringLiteral(node.arguments[0])) {
+      imports.push({ from: node.arguments[0].text, symbols: ['require'] });
+    }
     if (ts.isFunctionDeclaration(node) && node.name && isExported(node)) {
       exportedFunctions.push({
         name: node.name.text,

@@ -4,27 +4,37 @@ on:
   pull_request:
 
 jobs:
-  build-and-test:
+  skill-and-tests:
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Install MCP dependencies
+      - name: Install maintainer dependencies
         run: npm install --no-audit --no-fund
-      - name: Install demo dependencies
-        run: npm install --prefix examples/demo-react --legacy-peer-deps --no-audit --no-fund
-      - name: Typecheck MCP toolkit
+      - name: Typecheck helpers
         run: npm run typecheck
       - name: Unit tests
         run: npm test
+      - name: Build portable Skill runtime
+        run: npm run bundle:skill
+      - name: Verify generated runtime unchanged
+        run: git diff --exit-code -- .cline/skills/react-unit-testing/scripts/lib
+      - name: Install portable Skill helper dependency
+        run: npm install --prefix .cline/skills/react-unit-testing/scripts --ignore-scripts --no-audit --no-fund
+      - name: Install React demo dependencies
+        run: npm install --prefix examples/demo-react --legacy-peer-deps --no-audit --no-fund
+      - name: Install Jest CommonJS demo dependencies
+        run: npm install --prefix examples/demo-jest --no-audit --no-fund
       - name: Typecheck React demo
         run: npm run typecheck --prefix examples/demo-react
-      - name: Demo component and hook tests
+      - name: Run React demo tests
         run: npm run test:demo
-      - name: Real MCP handshake and Vitest tool smoke test
-        run: npm run test:mcp
-      - name: Demo coverage JSON generation
+      - name: Run Jest CommonJS demo tests
+        run: npm run test --prefix examples/demo-jest
+      - name: Run portable Skill CLI smoke
+        run: npm run test:skill
+      - name: Generate demo coverage
         run: npm run coverage:demo

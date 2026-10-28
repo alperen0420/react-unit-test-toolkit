@@ -40,7 +40,7 @@ export async function getTestCoverage(sourceFile: string): Promise<object> {
       return {
         available: false,
         sourceFile: source.relative,
-        message: 'No coverage/coverage-final.json file. Run the React project Vitest with --coverage and JSON reporter first.',
+        message: "No coverage/coverage-final.json file. Run the project's Jest/Vitest coverage command with Istanbul JSON output first.",
       };
     }
     throw err;

@@ -6,7 +6,7 @@ import path from 'node:path';
 import { buildDependencyIndex, getRelatedContext, getAffectedComponents } from '../relations.js';
 
 const create = async () => {
-  const root = await mkdtemp(path.join(os.tmpdir(), 'mcp-relations-'));
+  const root = await mkdtemp(path.join(os.tmpdir(), 'skill-relations-'));
   await mkdir(path.join(root, 'src/components'), { recursive: true });
   await mkdir(path.join(root, 'src/hooks'), { recursive: true });
   await mkdir(path.join(root, 'src/utils'), { recursive: true });
