@@ -1,1 +1,0 @@
-Generated from root TypeScript sources. Rebuild with npm run bundle:skill.
