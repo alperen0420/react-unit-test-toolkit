@@ -36,17 +36,17 @@ These are **possibilities, not a checklist to blindly apply**. A component witho
 
 ## Patterns that create meaningful tests
 
-**React Testing Library:** Prefer accessible `getByRole`, `findByRole` and `queryByRole` queries; use realistic `userEvent` interactions for simulated DOM tests. Await asynchronous updates and interactions; avoid arbitrary sleeps and private-state assertions.
+**React Testing Library (only if already installed):** Prefer accessible `getByRole`, `findByRole` and `queryByRole` queries; use realistic `userEvent` interactions **only if the project already has the necessary library**. Await asynchronous updates and interactions; avoid arbitrary sleeps and private-state assertions. If a necessary testing module is missing, stop and report it; do not install it.
 
 **Hooks:** Test through a consumer or the project's established hook utilities. Verify observed state transitions, cleanup and error behavior, not private implementation details.
 
-**Networking:** Use existing MSW handlers or compatible module mocks at the external boundary. Distinguish an API failure from a component failure. Do not mock the component or its core logic away.
+**Networking:** Reuse **already installed** MSW handlers or Jest/Vitest mocks at the external boundary. Never add MSW or any mocking package as part of this skill. Distinguish an API failure from a component failure. Do not mock the component or its core logic away.
 
 **Forms:** Verify visible validation, input correction, submission payload/contract and disabled/loading behavior only where implementation supports them.
 
 **Existing tests:** Reuse render helpers, factories, service mocks and accessibility conventions; extend rather than overwrite. Never add duplicated assertions that just restate the same signal.
 
-**Framework fidelity:** Match Jest (`jest.fn`, CommonJS where appropriate) or Vitest (`vi.fn`) as installed. Follow the project's test environment and naming conventions.
+**Framework fidelity:** Match the **verified, locally available** Jest (`jest.fn`, CommonJS where appropriate) or Vitest (`vi.fn`) and its existing setup. Do not write tests that depend on uninstalled libraries or create infrastructure to make them run.
 
 ## Example: profile editor (illustrative, not mandatory)
 
